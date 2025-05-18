@@ -3,60 +3,6 @@ import ReactMarkdown from 'react-markdown';
 import styles from './App.module.css';
 
 
-// 🔧 スタイルまとめ
-const styles = {
-  container: {
-    padding: '1rem',
-  },
-  searchInput: {
-    padding: '0.5rem',
-    marginBottom: '1.5rem',
-    width: '100%',
-    fontSize: '1rem',
-    border: '1px solid #ccc',
-    borderRadius: '5px',
-  },
-  tabBar: {
-    display: 'flex',
-    gap: '0.5rem',
-    marginBottom: '1rem',
-  },
-  tabInput: {
-    padding: '0.3rem',
-    width: '100px',
-  },
-  tabButton: (isActive) => ({
-    padding: '0.5rem 1rem',
-    fontWeight: isActive ? 'bold' : 'normal',
-    backgroundColor: isActive ? '#dfe6e9' : '#f1f2f6',
-    border: '1px solid #ccc',
-    borderRadius: '5px',
-    marginRight: '0.25rem',
-  }),
-  textarea: {
-    width: '100%',
-    fontSize: '1rem',
-    padding: '0.5rem',
-  },
-  previewCard: {
-    border: '1px solid #ccc',
-    padding: '1rem',
-    marginTop: '1rem',
-    borderRadius: '8px',
-    backgroundColor: '#f9f9f9',
-  },
-  previewText: {
-    background: '#f9f9f9',
-    padding: '1rem',
-    borderRadius: '5px',
-  },
-  image: {
-    maxWidth: '100%',
-    borderRadius: '4px',
-  },
-};
-
-
 // ✅ 1. キャッシュを外で定義（Appの外、ファイル先頭付近）
 const previewCache = new Map();
 
@@ -197,19 +143,20 @@ function App() {
 
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div className={styles.container}>
       <h1>📝 タブ付きメモ帳</h1>
-      {/* ✅ 1. 検索ボックス */}
+
+      {/* 検索ボックス */}
       <input
         type="text"
         placeholder="検索..."
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
-        style={styles.searchInput}
+        className={styles.searchInput}
       />
 
-      {/* ✅ 2. タブバー */}
-      <div style={styles.tabBar}>
+      {/* タブバー */}
+      <div className={styles.tabBar}>
         {filteredTabs.map(tab => (
           editingTabId === tab.id ? (
             <input
@@ -230,13 +177,17 @@ function App() {
                 }
               }}
               autoFocus
-              style={styles.tabInput}
+              className={styles.tabInput}
             />
           ) : (
             <button
               onClick={() => handleTabClick(tab.id)}
               onDoubleClick={() => setEditingTabId(tab.id)}
-              style={styles.tabButton(tab.id === activeTabId)}
+              className={
+                tab.id === activeTabId
+                  ? styles.tabButton + ' ' + styles.active
+                  : styles.tabButton
+              }
             >
               {highlightMatch(tab.title, searchText)}
             </button>
@@ -245,24 +196,25 @@ function App() {
         <button onClick={handleAddTab}>＋</button>
       </div>
 
-      {/* ✅ 3. メモ本文とプレビュー */}
+      {/* メモ本文 */}
       {activeTab && (
         <>
+          <h2>{activeTab.title}</h2>
           <textarea
             value={activeTab.content}
             onChange={handleChangeContent}
             rows={10}
             cols={50}
-            style={styles.textarea}
+            className={styles.textarea}
           />
 
           {linkPreview && (
-            <div style={styles.previewCard}>
+            <div className={styles.previewCard}>
               <a href={linkPreview.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <h4>{linkPreview.title}</h4>
                 <p>{linkPreview.description}</p>
                 {linkPreview.image?.url && (
-                  <img src={linkPreview.image.url} alt="" style={styles.image} />
+                  <img src={linkPreview.image.url} alt="" className={styles.image} />
                 )}
               </a>
             </div>
@@ -271,12 +223,11 @@ function App() {
           <hr style={{ margin: '1rem 0' }} />
 
           <h3>プレビュー</h3>
-          <div style={styles.previewText}>
+          <div className={styles.previewText}>
             {searchText
               ? highlightMatch(activeTab.content, searchText)
               : <ReactMarkdown>{activeTab.content}</ReactMarkdown>}
           </div>
-
         </>
       )}
     </div>

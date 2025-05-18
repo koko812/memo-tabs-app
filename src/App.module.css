@@ -1,0 +1,62 @@
+.container {
+    padding: 1rem;
+}
+
+.searchInput {
+    padding: 0.5rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.tabBar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.tabInput {
+    padding: 0.3rem;
+    width: 100px;
+}
+
+.tabButton {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 0.25rem;
+    background-color: #f1f2f6;
+    font-weight: normal;
+}
+
+.tabButton.active {
+    background-color: #dfe6e9;
+    font-weight: bold;
+}
+
+.textarea {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.5rem;
+}
+
+.previewCard {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.previewText {
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: 5px;
+}
+
+.image {
+    max-width: 100%;
+    border-radius: 4px;
+}
