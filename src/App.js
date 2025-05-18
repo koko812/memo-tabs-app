@@ -6,12 +6,18 @@ function App() {
     { id: 1, title: 'メモ1', content: '' },
   ]);
   const [activeTabId, setActiveTabId] = useState(1);
+  const [nextTabNumber, setNextTabNumber] = useState(2);
 
   const handleAddTab = () => {
-    const newId = Date.now(); // 簡易的なユニークID
-    setTabs([...tabs, { id: newId, title: `メモ${tabs.length + 1}`, content: '' }]);
+    const newId = Date.now();
+    setTabs([
+      ...tabs,
+      { id: newId, title: `メモ${nextTabNumber}`, content: '' }
+    ]);
+    setNextTabNumber(n => n + 1); // ← カウント進める！
     setActiveTabId(newId);
   };
+
 
   const handleTabClick = (id) => {
     setActiveTabId(id);
@@ -28,6 +34,18 @@ function App() {
     );
   };
 
+  const handleDeleteTab = (id) => {
+    setTabs(prevTabs => {
+      const newTabs = prevTabs.filter(tab => tab.id !== id);
+      if (activeTabId === id) {
+        const fallbackTab = newTabs[0]?.id ?? null;
+        setActiveTabId(fallbackTab);
+      }
+      return newTabs;
+    });
+  };
+
+
   const activeTab = tabs.find(tab => tab.id === activeTabId);
 
   return (
@@ -37,19 +55,23 @@ function App() {
       {/* タブバー */}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
         {tabs.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => handleTabClick(tab.id)}
-            style={{
-              padding: '0.5rem 1rem',
-              fontWeight: tab.id === activeTabId ? 'bold' : 'normal',
-              backgroundColor: tab.id === activeTabId ? '#dfe6e9' : '#f1f2f6',
-              border: '1px solid #ccc',
-              borderRadius: '5px'
-            }}
-          >
-            {tab.title}
-          </button>
+          <div key={tab.id} style={{ display: 'flex', alignItems: 'center' }}>
+            <button
+              onClick={() => handleTabClick(tab.id)}
+              style={{
+                padding: '0.5rem 1rem',
+                fontWeight: tab.id === activeTabId ? 'bold' : 'normal',
+                backgroundColor: tab.id === activeTabId ? '#dfe6e9' : '#f1f2f6',
+                border: '1px solid #ccc',
+                borderRadius: '5px',
+                marginRight: '0.25rem'
+              }}
+            >
+              {tab.title}
+            </button>
+            <button onClick={() => handleDeleteTab(tab.id)} style={{ color: 'red' }}>🗑</button>
+          </div>
+
         ))}
         <button onClick={handleAddTab}>＋</button>
       </div>
@@ -65,6 +87,8 @@ function App() {
           style={{ width: '100%', fontSize: '1rem', padding: '0.5rem' }}
         />
       </div>
+
+
     </div>
   );
 }
