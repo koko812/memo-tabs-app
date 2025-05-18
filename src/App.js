@@ -1,5 +1,61 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import styles from './App.module.css';
+
+
+// 🔧 スタイルまとめ
+const styles = {
+  container: {
+    padding: '1rem',
+  },
+  searchInput: {
+    padding: '0.5rem',
+    marginBottom: '1.5rem',
+    width: '100%',
+    fontSize: '1rem',
+    border: '1px solid #ccc',
+    borderRadius: '5px',
+  },
+  tabBar: {
+    display: 'flex',
+    gap: '0.5rem',
+    marginBottom: '1rem',
+  },
+  tabInput: {
+    padding: '0.3rem',
+    width: '100px',
+  },
+  tabButton: (isActive) => ({
+    padding: '0.5rem 1rem',
+    fontWeight: isActive ? 'bold' : 'normal',
+    backgroundColor: isActive ? '#dfe6e9' : '#f1f2f6',
+    border: '1px solid #ccc',
+    borderRadius: '5px',
+    marginRight: '0.25rem',
+  }),
+  textarea: {
+    width: '100%',
+    fontSize: '1rem',
+    padding: '0.5rem',
+  },
+  previewCard: {
+    border: '1px solid #ccc',
+    padding: '1rem',
+    marginTop: '1rem',
+    borderRadius: '8px',
+    backgroundColor: '#f9f9f9',
+  },
+  previewText: {
+    background: '#f9f9f9',
+    padding: '1rem',
+    borderRadius: '5px',
+  },
+  image: {
+    maxWidth: '100%',
+    borderRadius: '4px',
+  },
+};
+
 
 // ✅ 1. キャッシュを外で定義（Appの外、ファイル先頭付近）
 const previewCache = new Map();
@@ -130,7 +186,7 @@ function App() {
     const urlRegex = /https?:\/\/[^\s]+/g;
     const text = activeTab?.content || '';
     const urls = text.match(urlRegex);
-  
+
     if (urls && urls.length > 0) {
       const url = urls[0];
       fetchPreview(url).then(setLinkPreview);
@@ -138,28 +194,22 @@ function App() {
       setLinkPreview(null);
     }
   }, [activeTab?.content]);
-  
+
 
   return (
     <div style={{ padding: '1rem' }}>
       <h1>📝 タブ付きメモ帳</h1>
+      {/* ✅ 1. 検索ボックス */}
       <input
         type="text"
         placeholder="検索..."
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
-        style={{
-          padding: '0.5rem',
-          marginBottom: '1.5rem', // ← ✨ ここを調整！
-          width: '100%',
-          fontSize: '1rem',
-          border: '1px solid #ccc',
-          borderRadius: '5px'
-        }}
+        style={styles.searchInput}
       />
 
-      {/* タブバー */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+      {/* ✅ 2. タブバー */}
+      <div style={styles.tabBar}>
         {filteredTabs.map(tab => (
           editingTabId === tab.id ? (
             <input
@@ -180,20 +230,13 @@ function App() {
                 }
               }}
               autoFocus
-              style={{ padding: '0.3rem', width: '100px' }}
+              style={styles.tabInput}
             />
           ) : (
             <button
               onClick={() => handleTabClick(tab.id)}
               onDoubleClick={() => setEditingTabId(tab.id)}
-              style={{
-                padding: '0.5rem 1rem',
-                fontWeight: tab.id === activeTabId ? 'bold' : 'normal',
-                backgroundColor: tab.id === activeTabId ? '#dfe6e9' : '#f1f2f6',
-                border: '1px solid #ccc',
-                borderRadius: '5px',
-                marginRight: '0.25rem'
-              }}
+              style={styles.tabButton(tab.id === activeTabId)}
             >
               {highlightMatch(tab.title, searchText)}
             </button>
@@ -202,48 +245,40 @@ function App() {
         <button onClick={handleAddTab}>＋</button>
       </div>
 
-      {/* メモ本文 */}
+      {/* ✅ 3. メモ本文とプレビュー */}
       {activeTab && (
         <>
-          <h2>{activeTab.title}</h2>
           <textarea
             value={activeTab.content}
             onChange={handleChangeContent}
             rows={10}
             cols={50}
-            style={{ width: '100%', fontSize: '1rem', padding: '0.5rem' }}
+            style={styles.textarea}
           />
 
           {linkPreview && (
-            <div style={{
-              border: '1px solid #ccc',
-              padding: '1rem',
-              marginTop: '1rem',
-              borderRadius: '8px',
-              backgroundColor: '#f9f9f9'
-            }}>
+            <div style={styles.previewCard}>
               <a href={linkPreview.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <h4>{linkPreview.title}</h4>
                 <p>{linkPreview.description}</p>
                 {linkPreview.image?.url && (
-                  <img src={linkPreview.image.url} alt="" style={{ maxWidth: '100%', borderRadius: '4px' }} />
+                  <img src={linkPreview.image.url} alt="" style={styles.image} />
                 )}
               </a>
             </div>
           )}
 
-
           <hr style={{ margin: '1rem 0' }} />
 
           <h3>プレビュー</h3>
-          <div style={{ background: '#f9f9f9', padding: '1rem', borderRadius: '5px' }}>
+          <div style={styles.previewText}>
             {searchText
               ? highlightMatch(activeTab.content, searchText)
               : <ReactMarkdown>{activeTab.content}</ReactMarkdown>}
           </div>
+
         </>
       )}
-
     </div>
   );
 }
