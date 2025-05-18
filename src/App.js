@@ -17,6 +17,17 @@ function App() {
     setActiveTabId(id);
   };
 
+  const handleChangeContent = (e) => {
+    const updatedContent = e.target.value;
+    setTabs(prevTabs =>
+      prevTabs.map(tab =>
+        tab.id === activeTabId
+          ? { ...tab, content: updatedContent }
+          : tab
+      )
+    );
+  };
+
   const activeTab = tabs.find(tab => tab.id === activeTabId);
 
   return (
@@ -43,10 +54,16 @@ function App() {
         <button onClick={handleAddTab}>＋</button>
       </div>
 
-      {/* メモ本文（まだ編集できない） */}
       <div>
         <h2>{activeTab.title}</h2>
-        <p>（ここに本文が入る予定）</p>
+        {/* 本文エリア */}
+        <textarea
+          value={activeTab.content}
+          onChange={handleChangeContent}
+          rows={10}
+          cols={50}
+          style={{ width: '100%', fontSize: '1rem', padding: '0.5rem' }}
+        />
       </div>
     </div>
   );
