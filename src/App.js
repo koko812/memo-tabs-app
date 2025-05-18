@@ -1,12 +1,41 @@
-// src/App.js
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function App() {
-  const [tabs, setTabs] = useState([
-    { id: 1, title: 'メモ1', content: '' },
-  ]);
-  const [activeTabId, setActiveTabId] = useState(1);
-  const [nextTabNumber, setNextTabNumber] = useState(2);
+  const [tabs, setTabs] = useState([]);
+  const [activeTabId, setActiveTabId] = useState(null);
+  const [nextTabNumber, setNextTabNumber] = useState(1);
+
+  // ✅ 起動時に localStorage から復元 or 初期化
+  useEffect(() => {
+    try {
+      const savedTabs = JSON.parse(localStorage.getItem('tabs'));
+      const savedActiveId = localStorage.getItem('activeTabId');
+      const savedTabNumber = localStorage.getItem('nextTabNumber');
+
+      if (Array.isArray(savedTabs) && savedTabs.length > 0) {
+        setTabs(savedTabs);
+        setActiveTabId(Number(savedActiveId));
+        setNextTabNumber(Number(savedTabNumber));
+      } else {
+        throw new Error("No saved tabs");
+      }
+    } catch {
+      const defaultId = Date.now();
+      setTabs([{ id: defaultId, title: 'メモ1', content: '' }]);
+      setActiveTabId(defaultId);
+      setNextTabNumber(2);
+    }
+  }, []);
+
+  // ✅ 状態が変わるたびに localStorage に保存
+  useEffect(() => {
+    if (tabs.length > 0) {
+      // console.log("🔄 Saving to localStorage...");
+      localStorage.setItem('tabs', JSON.stringify(tabs));
+      localStorage.setItem('activeTabId', activeTabId ?? '');
+      localStorage.setItem('nextTabNumber', nextTabNumber);
+    }
+  }, [tabs, activeTabId, nextTabNumber]);
 
   const handleAddTab = () => {
     const newId = Date.now();
@@ -14,10 +43,9 @@ function App() {
       ...tabs,
       { id: newId, title: `メモ${nextTabNumber}`, content: '' }
     ]);
-    setNextTabNumber(n => n + 1); // ← カウント進める！
+    setNextTabNumber(n => n + 1);
     setActiveTabId(newId);
   };
-
 
   const handleTabClick = (id) => {
     setActiveTabId(id);
@@ -45,7 +73,6 @@ function App() {
     });
   };
 
-
   const activeTab = tabs.find(tab => tab.id === activeTabId);
 
   return (
@@ -71,24 +98,25 @@ function App() {
             </button>
             <button onClick={() => handleDeleteTab(tab.id)} style={{ color: 'red' }}>🗑</button>
           </div>
-
         ))}
         <button onClick={handleAddTab}>＋</button>
       </div>
 
-      <div>
-        <h2>{activeTab.title}</h2>
-        {/* 本文エリア */}
-        <textarea
-          value={activeTab.content}
-          onChange={handleChangeContent}
-          rows={10}
-          cols={50}
-          style={{ width: '100%', fontSize: '1rem', padding: '0.5rem' }}
-        />
-      </div>
-
-
+      {/* メモ本文 */}
+      {activeTab ? (
+        <div>
+          <h2>{activeTab.title}</h2>
+          <textarea
+            value={activeTab.content}
+            onChange={handleChangeContent}
+            rows={10}
+            cols={50}
+            style={{ width: '100%', fontSize: '1rem', padding: '0.5rem' }}
+          />
+        </div>
+      ) : (
+        <p>メモがありません。新しいタブを追加してください。</p>
+      )}
     </div>
   );
 }
