@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+
 
 function App() {
   const [tabs, setTabs] = useState([]);
@@ -160,8 +162,8 @@ function App() {
       </div>
 
       {/* メモ本文 */}
-      {activeTab ? (
-        <div>
+      {activeTab && (
+        <>
           <h2>{activeTab.title}</h2>
           <textarea
             value={activeTab.content}
@@ -170,13 +172,18 @@ function App() {
             cols={50}
             style={{ width: '100%', fontSize: '1rem', padding: '0.5rem' }}
           />
-          <p style={{ whiteSpace: 'pre-wrap' }}>
-            {highlightMatch(activeTab?.content ?? '', searchText)}
-          </p>
-        </div>
-      ) : (
-        <p>メモがありません。新しいタブを追加してください。</p>
+
+          <hr style={{ margin: '1rem 0' }} />
+
+          <h3>プレビュー</h3>
+          <div style={{ background: '#f9f9f9', padding: '1rem', borderRadius: '5px' }}>
+            {searchText
+              ? highlightMatch(activeTab.content, searchText)
+              : <ReactMarkdown>{activeTab.content}</ReactMarkdown>}
+          </div>
+        </>
       )}
+
     </div>
   );
 }

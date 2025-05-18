@@ -1,5 +1,72 @@
 # 📘 LEARNED.md - タブ切り替えメモ帳（ステップ１）
 
+## 📘 LEARNED.md - ver 1.7（Markdown入力 & プレビュー機能の追加）
+
+---
+
+### ✅ 今回やったこと
+
+* `react-markdown` を導入し、Markdown記法による装飾表示が可能に
+* `textarea` で入力された内容をリアルタイムに `<ReactMarkdown>` でプレビュー表示
+* Markdownによって、タイトルや太字、リスト、コードブロックなどが整った見た目で表示可能に
+* 検索中はハイライト表示（`highlightMatch()`）を使い、それ以外はMarkdown表示と分岐
+* `<ReactMarkdown>{activeTab.content}</ReactMarkdown>` の構造と動作原理を理解
+
+---
+
+### 🧠 学び・気づき
+
+#### 🔹 `<ReactMarkdown>` の仕組みとすごさ（タグで囲むだけの手軽さ）
+
+* Markdown文字列をHTML（JSX）に変換する魔法のコンポーネント
+* 裏では `remark` ライブラリなどを使って Markdown → 構文木 → React要素 に変換している
+* `# 見出し` → `<h1>`、`**太字**` → `<strong>`、リストやコードブロックも自動でHTML化
+* JSX内に簡単に組み込めるため、エディタUIとの親和性が高い
+* 特に驚くべきは、`<ReactMarkdown>{activeTab.content}</ReactMarkdown>` と**タグで囲むだけで自動でMarkdownが反映される**という手軽さ。導入のハードルが非常に低いのが魅力
+
+#### 🔹 Markdown表示と検索ハイライトの両立について
+
+* Markdown表示中に `<mark>` を差し込むのは構文木操作が必要でやや高度
+* 現実的には「検索時はハイライト、それ以外はMarkdown」で切り替える方法が実用的かつ安全
+* 条件分岐で `{searchText ? highlightMatch(...) : <ReactMarkdown>...}` の構成が現実解
+
+#### 🔹 JSXの条件描画パターンの違い
+
+```jsx
+{cond ? <Component /> : null}  // 三項演算子
+{cond && <Component />}        // AND演算子（よりシンプル）
+```
+
+* 今回のような「truthy のときだけ表示したい」ケースでは `&&` の方が簡潔
+* JSX内での条件描画のバリエーションを習得
+
+#### 🔹 `react-markdown` のインストールと管理
+
+* 自分で `npm install react-markdown` した場合、`package.json` に自動で依存が記録される
+* 他の人が `git clone` して使うときも、`npm install` すれば自動でインストールされる
+* `node_modules/` は `.gitignore` でGit管理から除外しておくのが基本
+
+---
+
+### 📝 コミットメッセージ案
+
+```
+feat: Markdown入力とリアルタイムプレビュー機能を追加
+```
+
+* `react-markdown` を導入して、Markdown記法に対応
+* 入力中のメモ本文をリアルタイムでHTMLに変換して表示
+* 検索時は `highlightMatch()`、それ以外はMarkdown表示に分岐処理
+* JSXの条件描画に `&&` パターンを活用
+
+---
+
+次は Markdownの保存拡張、コードブロックのハイライト、TypeScript化などにも挑戦できるフェーズです！
+
+</br>
+</br>
+</br>
+
 ## 📘 LEARNED.md - ver 1.6（検索結果のハイライトと状態設計の深掘り）
 
 ---
@@ -44,6 +111,18 @@ const highlightMatch = (text, keyword) => {
 * `map()` と三項演算子で JSX を分岐描画
 * `toLowerCase()` による case-insensitive 比較が鍵
 * `key` を使って React の再描画最適化も考慮
+
+#### 🔹 `<mark>` と `<span>` を使い分ける理由
+
+* 検索語と一致した部分は `<mark>` でハイライト、それ以外は `<span>` にして通常表示
+* 一致／非一致の部分を明確に分離し、視認性と意味を両立させた構成になっている
+
+#### 🔹 `key` 属性の役割と効果
+
+* Reactでは `.map()` で繰り返し描画する際、各要素に一意な `key` を付ける必要がある
+* `key` によって React は要素の変更差分を正確に把握し、不要な再描画を防ぐことができる（パフォーマンス最適化）
+* 今回は単純な文字列分割なので `index` をそのまま `key` に使っても安全
+* 一致箇所が複数あっても、split() で分割された部分は順番に parts[0], parts[1], ... となるため、i（配列のインデックス）をそのまま key として使っても重複せず一意性が保たれる
 
 #### 🔹 CSSを適用するために必要な import
 
