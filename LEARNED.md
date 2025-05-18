@@ -1,4 +1,90 @@
 # 📘 LEARNED.md - タブ切り替えメモ帳（ステップ１）
+
+## 📘 LEARNED.md - ver 1.4（タブタイトルのインライン編集と状態の再設計）
+
+---
+
+### ✅ 今回やったこと
+
+* タブタイトルを「インライン編集」できるように機能追加
+
+  * `editingTabId` を導入し、編集対象のタブIDを一時的に管理
+  * `editingTabId === tab.id` の場合に `<input>` を表示、そうでなければ `<button>`
+  * `onDoubleClick` で編集モードに入り、`onBlur` や `Enter` キーで編集確定
+* 編集中は `autoFocus` を用いて即座に入力可能なUXを実現
+* タイトル変更時は `setTabs()` を使って対象の `tab.title` を更新
+* 編集後のタイトルも `tabs` の一部として `localStorage` に保存されるため、リロードしても保持される
+* JSX内の三項演算子を用いた条件描画に慣れ始めた
+
+---
+
+### 🧠 学び・気づき
+
+#### 🔹 JSX内の三項演算子の活用
+
+* `condition ? <A /> : <B />` という構文は、JSX内で「UIを出し分ける」ための定番手法
+* `if` 文が使えない理由は、`if` が「文（statement）」であり、JSXの `{}` 内には「式（expression）」しか書けないため
+
+#### 🔹 `editingTabId` と `activeTabId` の役割の分離
+
+* 編集中のタブ（=タイトルを書き換え中）とアクティブなタブ（=本文を編集中）は**意味が違う**
+* 状態を分けておくことで、UIの責任が明確になり、柔軟に制御できる
+
+#### 🔹 `autoFocus` の役割
+
+* `<input autoFocus />` と書くことで、描画と同時にフォーカス（カーソル）を自動で入れることができる
+* `autoFocus={true}` と同義。Boolean属性として簡略記法が可能
+
+#### 🔹 JSXとDOMの対応関係への理解
+
+* `return <div>...</div>` は、JavaScriptにおける `document.createElement()` + `appendChild()` の進化形
+* Reactは `React.createElement()` を使って仮想DOMを生成し、変更がある部分だけを差分レンダリングする
+
+#### 🔹 `onChange` の基本と応用
+
+* `onChange` は入力要素の値が変更された時に実行されるイベントハンドラ
+* `e.target.value` によって、現在の入力内容を取得できる
+* `onChange={(e) => setText(e.target.value)}` はReactにおける「Controlled Component」の基本パターン
+
+#### 🔹 状態更新関数における「関数型引数」の意味
+
+* `setNextTabNumber(n => n + 1)` のように関数を渡すことで、**最新の状態を安全に参照して更新**できる
+* 同期的な処理内での複数回更新や、競合の回避に有効
+
+#### 🔹 初期値を明示的に与える必要性
+
+* `setNextTabNumber(n => n + 1)` を使うには、**`n` の初期値が必須**
+* 初回だけ `setNextTabNumber(2)` を明示しているのは、`"メモ1"` を最初に手動で生成しているから
+* 初期値がないまま `+1` をしようとすると `undefined + 1 = NaN` になりバグの原因に
+
+#### 🔹 `useEffect(..., [])` の意味
+
+* 第二引数 `[]` は「依存配列」
+* 何も依存していないことを意味するので、**マウント時（初回レンダリング時）に1回だけ実行される**
+* `componentDidMount` 相当の処理をReact関数型で書くための定石パターン
+
+#### 🔹 `nextTabNumber` を明示的に持つ設計意図
+
+* `"メモ${nextTabNumber}"` のように連番でタイトルをつける設計では、削除の影響を受けずに一意なタイトルを維持できる
+* `tabs.length + 1` を使う方法もあるが、削除があるとタイトル重複のリスクがあるため、状態で保持する方が安全
+
+---
+
+### 📝 コミットメッセージ案
+
+```
+feat: タブタイトルのインライン編集機能を実装
+```
+
+* `editingTabId` によって編集モードを制御
+* 三項演算子で `<button>` / `<input>` を条件分岐
+* 編集内容は `tabs` の一部として保持・保存
+* `autoFocus` によりUX向上
+
+</br>
+</br>
+</br>
+
 ## 📘 LEARNED.md - ver 1.3（localStorageによる状態の永続化）
 
 ### ✅ 今回やったこと

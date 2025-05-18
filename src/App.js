@@ -4,6 +4,8 @@ function App() {
   const [tabs, setTabs] = useState([]);
   const [activeTabId, setActiveTabId] = useState(null);
   const [nextTabNumber, setNextTabNumber] = useState(1);
+  const [editingTabId, setEditingTabId] = useState(null);
+  ;
 
   // ✅ 起動時に localStorage から復元 or 初期化
   useEffect(() => {
@@ -82,9 +84,31 @@ function App() {
       {/* タブバー */}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
         {tabs.map(tab => (
-          <div key={tab.id} style={{ display: 'flex', alignItems: 'center' }}>
+          editingTabId === tab.id ? (
+            <input
+              type="text"
+              value={tab.title}
+              onChange={(e) => {
+                const newTitle = e.target.value;
+                setTabs(prevTabs =>
+                  prevTabs.map(t =>
+                    t.id === tab.id ? { ...t, title: newTitle } : t
+                  )
+                );
+              }}
+              onBlur={() => setEditingTabId(null)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  setEditingTabId(null);
+                }
+              }}
+              autoFocus
+              style={{ padding: '0.3rem', width: '100px' }}
+            />
+          ) : (
             <button
               onClick={() => handleTabClick(tab.id)}
+              onDoubleClick={() => setEditingTabId(tab.id)}
               style={{
                 padding: '0.5rem 1rem',
                 fontWeight: tab.id === activeTabId ? 'bold' : 'normal',
@@ -96,8 +120,7 @@ function App() {
             >
               {tab.title}
             </button>
-            <button onClick={() => handleDeleteTab(tab.id)} style={{ color: 'red' }}>🗑</button>
-          </div>
+          )
         ))}
         <button onClick={handleAddTab}>＋</button>
       </div>
