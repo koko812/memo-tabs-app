@@ -188,8 +188,8 @@ function App() {
               onClick={() => handleTabClick(tab.id)}
               onDoubleClick={() => setEditingTabId(tab.id)}
               className={`px-4 py-2 rounded-md border ${tab.id === activeTabId
-                  ? 'bg-blue-100 font-bold text-blue-700'
-                  : 'bg-gray-100 hover:bg-gray-200'
+                ? 'bg-blue-100 font-bold text-blue-700'
+                : 'bg-gray-100 hover:bg-gray-200'
                 }`}
             >
               {highlightMatch(tab.title, searchText)}
@@ -222,15 +222,16 @@ function App() {
               </a>
             </div>
           )}
-
-          <hr style={{ margin: '1rem 0' }} />
-
           <h3>プレビュー</h3>
-          <div className={styles.previewText}>
-            {searchText
-              ? highlightMatch(activeTab.content, searchText)
-              : <ReactMarkdown>{activeTab.content}</ReactMarkdown>}
-          </div>
+          {searchText ? (
+            <div className={styles.previewText}>
+              {highlightMatch(activeTab.content, searchText)}
+            </div>
+          ) : (
+            <div className="prose max-w-none">
+              <ReactMarkdown>{activeTab.content}</ReactMarkdown>
+            </div>
+          )}
         </>
       )}
     </div>

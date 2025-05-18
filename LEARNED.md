@@ -1,5 +1,83 @@
 # 📘 LEARNED.md - タブ切り替えメモ帳（ステップ１）
 
+## 📘 LEARNED.md - ver 2.3（Tailwind Typography Plugin `prose` の本格導入）
+
+---
+
+### ✅ 今回やったこと
+
+* Tailwind CSS の Typography Plugin（`@tailwindcss/typography`）を導入し、Markdown表示を大幅に美しくした
+* Markdown を表示していた `<ReactMarkdown>` を `<div className="prose max-w-none">` でラップ
+* 検索時は従来通り `highlightMatch()` による `<mark>` ハイライトを適用し、検索表示と Markdown 表示を共存
+* UI全体の読みやすさ・構造的な整合性が向上し、まるで Zenn や Obsidian のようなリッチメモに進化
+
+---
+
+### 🧠 学び・気づき
+
+#### 🔹 Tailwind Typography Plugin (`prose`) の力
+
+* Tailwind に付属するプラグインであり、`prose` クラスをつけるだけで Markdown 表示が構造的に整う
+* `h1~h6`, `ul`, `ol`, `p`, `code`, `blockquote`, `table` などを自動で整形
+* `max-w-prose` がデフォルトのため、`max-w-none` を指定することで横幅を広げた
+
+#### 🔹 Markdown と検索ハイライトの両立
+
+* 検索中は Markdown を通常の `ReactMarkdown` でレンダリングせず、文字列として扱って `<mark>` タグで囲んで表示
+* それ以外は `prose` によって整形された見た目を採用し、美しさと検索体験を両立
+
+```jsx
+{searchText ? (
+  <div className={styles.previewText}>
+    {highlightMatch(activeTab.content, searchText)}
+  </div>
+) : (
+  <div className="prose max-w-none">
+    <ReactMarkdown>{activeTab.content}</ReactMarkdown>
+  </div>
+)}
+```
+
+#### 🔹 `<mark>` タグとセマンティクス
+
+* ただの背景装飾ではなく、「検索結果・注目ポイント」として意味をもたせたタグ
+* スクリーンリーダー等にも有効で、意味のある HTML 構造に
+
+---
+
+### ❓ WYSIWYG とは？
+
+> **What You See Is What You Get（見たまま編集）**
+
+* 実際の表示と同じレイアウトで編集できる形式のエディタ
+* 例：Notion、Google Docs、Word など
+* Markdown のようなプレーンテキストではなく、太字・見出し・画像などをその場で編集可能
+
+Tailwind や Markdown パーサーの組み合わせでも、WYSIWYG 的なUIを構築することは可能（やや難易度は高め）
+
+---
+
+### 📝 コミットメッセージ案
+
+```
+feat: prose クラスによる Markdown の美しい整形を導入（Tailwind Typography）
+```
+
+---
+
+### 🚀 今後やりたいこと
+
+* コードブロックのシンタックスハイライト追加
+* 画像貼り付けやリンク挿入の支援
+* Markdown + WYSIWYG のハイブリッドモード実装（例：Notion風エディタ）
+* ノート一覧・タブの並び替えなどもUX向上ポイント
+
+今後は Tailwind + Markdown の力を最大限に活かして、より「実用的な日常メモツール」に進化させていきたい！
+
+</br>
+</br>
+</br>
+
 ## 📘 LEARNED.md - ver 2.1（Tailwind CSS 導入とスタイル整理）
 
 ---
