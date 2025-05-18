@@ -1,6 +1,30 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 
+// ✅ 1. キャッシュを外で定義（Appの外、ファイル先頭付近）
+const previewCache = new Map();
+
+// ✅ 2. fetchPreview関数でキャッシュを活用
+const fetchPreview = async (url) => {
+  if (previewCache.has(url)) {
+    return previewCache.get(url);
+  }
+
+  try {
+    const res = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);
+    const json = await res.json();
+
+    if (json.status === 'success') {
+      previewCache.set(url, json.data);
+      return json.data;
+    } else {
+      return null;
+    }
+  } catch {
+    return null;
+  }
+};
+
 
 function App() {
   const [tabs, setTabs] = useState([]);
@@ -8,6 +32,8 @@ function App() {
   const [nextTabNumber, setNextTabNumber] = useState(1);
   const [editingTabId, setEditingTabId] = useState(null);
   const [searchText, setSearchText] = useState('');
+  const [linkPreview, setLinkPreview] = useState(null);
+
 
   // ✅ 起動時に localStorage から復元 or 初期化
   useEffect(() => {
@@ -40,6 +66,8 @@ function App() {
       localStorage.setItem('nextTabNumber', nextTabNumber);
     }
   }, [tabs, activeTabId, nextTabNumber]);
+
+
 
   const handleAddTab = () => {
     const newId = Date.now();
@@ -98,6 +126,19 @@ function App() {
     tab.title.includes(searchText) || tab.content.includes(searchText)
   );
 
+  useEffect(() => {
+    const urlRegex = /https?:\/\/[^\s]+/g;
+    const text = activeTab?.content || '';
+    const urls = text.match(urlRegex);
+  
+    if (urls && urls.length > 0) {
+      const url = urls[0];
+      fetchPreview(url).then(setLinkPreview);
+    } else {
+      setLinkPreview(null);
+    }
+  }, [activeTab?.content]);
+  
 
   return (
     <div style={{ padding: '1rem' }}>
@@ -172,6 +213,25 @@ function App() {
             cols={50}
             style={{ width: '100%', fontSize: '1rem', padding: '0.5rem' }}
           />
+
+          {linkPreview && (
+            <div style={{
+              border: '1px solid #ccc',
+              padding: '1rem',
+              marginTop: '1rem',
+              borderRadius: '8px',
+              backgroundColor: '#f9f9f9'
+            }}>
+              <a href={linkPreview.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <h4>{linkPreview.title}</h4>
+                <p>{linkPreview.description}</p>
+                {linkPreview.image?.url && (
+                  <img src={linkPreview.image.url} alt="" style={{ maxWidth: '100%', borderRadius: '4px' }} />
+                )}
+              </a>
+            </div>
+          )}
+
 
           <hr style={{ margin: '1rem 0' }} />
 
