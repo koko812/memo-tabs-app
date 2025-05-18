@@ -145,6 +145,9 @@ function App() {
   return (
     <div className={styles.container}>
       <h1>📝 タブ付きメモ帳</h1>
+      <h1 className="text-2xl text-blue-600 font-bold">
+        Tailwind きてる？🚀
+      </h1>
 
       {/* 検索ボックス */}
       <input
@@ -152,11 +155,12 @@ function App() {
         placeholder="検索..."
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
-        className={styles.searchInput}
+        className="w-full px-3 py-2 mb-6 text-base border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+
       />
 
       {/* タブバー */}
-      <div className={styles.tabBar}>
+      <div className="flex gap-2 mb-4">
         {filteredTabs.map(tab => (
           editingTabId === tab.id ? (
             <input
@@ -183,11 +187,10 @@ function App() {
             <button
               onClick={() => handleTabClick(tab.id)}
               onDoubleClick={() => setEditingTabId(tab.id)}
-              className={
-                tab.id === activeTabId
-                  ? styles.tabButton + ' ' + styles.active
-                  : styles.tabButton
-              }
+              className={`px-4 py-2 rounded-md border ${tab.id === activeTabId
+                  ? 'bg-blue-100 font-bold text-blue-700'
+                  : 'bg-gray-100 hover:bg-gray-200'
+                }`}
             >
               {highlightMatch(tab.title, searchText)}
             </button>

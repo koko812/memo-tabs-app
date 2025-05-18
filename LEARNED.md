@@ -1,5 +1,126 @@
 # 📘 LEARNED.md - タブ切り替えメモ帳（ステップ１）
 
+## 📘 LEARNED.md - ver 2.1（Tailwind CSS 導入とスタイル整理）
+
+---
+
+### ✅ 今回やったこと
+
+* Tailwind CSS を v3 系でインストールし、React プロジェクトに導入
+* 検索ボックスを含む主要 UI（タブ・本文・見出しなど）に Tailwind クラスを適用し、洗練された見た目に
+* インライン `style={...}` で書かれていたスタイル定義を削除し、`className` に統一
+* Tailwind による一貫した設計により、スタイル調整やテーマ変更が圧倒的にやりやすくなった
+* Tailwind の動作を確認するための見出し (`Tailwind きてる？🚀`) をテスト表示
+
+---
+
+### 🧠 学び・気づき
+
+#### 🔹 Tailwind 導入の過程でつまずいた点と解決策
+
+* `npx tailwindcss init -p` 実行時に `command not found` が出た → 原因は `tailwindcss` が2重にインストールされていたこと
+  * `react-scripts` 内部の Tailwind v3.4.17 と、手動インストールした v4.1.7 が競合していた
+  * 解決方法：`node_modules` と `package-lock.json` を削除し、`tailwindcss@3` に固定して再インストール
+
+```bash
+rm -rf node_modules package-lock.json
+npm install -D tailwindcss@3 postcss autoprefixer
+npx tailwindcss init -p
+```
+
+* `tailwindcss --version` が動かないのは仕様（v3では --version が正常に動かないだけ）
+
+---
+
+#### 🔹 なぜ Tailwind を使いたかったのか？
+
+* `style={...}` が多くなりすぎてコードが読みにくくなってきた
+* Tailwind のユーティリティクラスなら短く、かつ意味が明確なクラス名でスタイル指定できる
+* className にまとめて書くことで、「このUIはどういう見た目か」が一目でわかる
+* CSS モジュールや Sass と違い、グローバルな命名衝突もなく安全
+
+---
+
+#### 🔹 Tailwind クラスの効果的な使い方がわかってきた！
+
+* `w-full`, `px-3 py-2`, `mb-6`, `rounded-md`, `border` などの組み合わせで、構造的にも美しい見た目が実現
+* 検索バーは以下のように書くだけで整ったUIに：
+
+```jsx
+<input
+  type="text"
+  placeholder="検索..."
+  value={searchText}
+  onChange={(e) => setSearchText(e.target.value)}
+  className="w-full px-3 py-2 mb-6 text-base border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+/>
+```
+
+* 今後、レスポンシブやダークモードにも `sm:`, `md:` や `dark:` をつけるだけで対応できる！
+
+---
+
+#### 🔹 npm install との関係にも理解が深まった
+
+* `rm -rf node_modules` をすると実際には全ての依存が削除されるため、再度 `npm install` が必要
+* これを忘れると、`react`, `react-dom`, `tailwindcss`, `microlink`, すべてが壊れた状態になる
+* `package.json` が設計図、`package-lock.json` が部品表、`node_modules` が実体という関係性が腑に落ちた
+
+---
+
+#### 🔹 Tailwind の有効確認の喜び
+
+```jsx
+<h1 className="text-2xl text-blue-600 font-bold">
+  Tailwind きてる？🚀
+</h1>
+```
+
+これが見た目に現れた瞬間、**「自分がスタイルを操っている」感覚が一気に高まった！**
+
+---
+
+### 📝 コミットメッセージ案
+
+```
+style: Tailwind CSS による検索バーとレイアウトの改善（v2.1 導入）
+```
+
+---
+
+### 🎯 次にやりたいこと
+
+* タブのボタンをより綺麗に並べたい
+* Markdown 表示部分（ReactMarkdown）にも Tailwind クラスを適用したい
+* Tailwind Typography Plugin（`prose`）の導入も候補
+* 本文編集部と OGP プレビューの余白・階層・デザイン整理
+* 最終的には全体的なレイアウト設計を Tailwind 中心に置き換えていきたい
+---
+
+#### 🔹 CRA（Create React App）と Vite の違いも学んだ！
+
+* 今回は CRA を使っているが、最近は Vite の方が人気になりつつある
+* 主な違いは以下の通り：
+
+| 項目 | CRA（Create React App） | Vite |
+|------|--------------------------|------|
+| バンドラー | Webpack | esbuild（+rollup） |
+| 起動速度 | やや遅い（全体バンドル） | 超高速（即時モジュール配信） |
+| ビルド速度 | Webpack依存で重め | 差分ビルドで爆速 |
+| 構成ファイル | 隠蔽されていてカスタマイズしにくい | 最初から構成可能で柔軟 |
+| 状態 | メンテナンスは続いているが停滞気味 | 活発で先進的、人気上昇中 |
+
+* CRA は初心者にやさしく、「何も考えずにReactを始められる」環境として便利
+* 一方、Vite は大規模開発・高速化・細かい制御が必要なときに真価を発揮
+* **最終的にはプロジェクト規模や目的に応じて使い分けるのがベスト！**
+
+* Tailwind との親和性でいうと Vite のほうが導入もコンパイルも軽快。
+  将来的に Vite に移行する可能性も視野に入れておくとよさそう！
+
+</br>
+</br>
+</br>
+
 ## 📘 LEARNED.md - ver 2.0（CSS Modules によるスタイル分離）
 
 ---
