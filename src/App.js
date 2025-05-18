@@ -5,7 +5,7 @@ function App() {
   const [activeTabId, setActiveTabId] = useState(null);
   const [nextTabNumber, setNextTabNumber] = useState(1);
   const [editingTabId, setEditingTabId] = useState(null);
-  ;
+  const [searchText, setSearchText] = useState('');
 
   // ✅ 起動時に localStorage から復元 or 初期化
   useEffect(() => {
@@ -75,15 +75,49 @@ function App() {
     });
   };
 
+  // 🔍 検索語にマッチした部分を <mark> で囲む
+  const highlightMatch = (text, keyword) => {
+    if (!keyword) return text;
+
+    const parts = text.split(new RegExp(`(${keyword})`, 'gi'));
+
+    return parts.map((part, i) =>
+      part.toLowerCase() === keyword.toLowerCase() ? (
+        <mark key={i}>{part}</mark>
+      ) : (
+        <span key={i}>{part}</span>
+      )
+    );
+  };
+
+
   const activeTab = tabs.find(tab => tab.id === activeTabId);
+  const filteredTabs = tabs.filter(tab =>
+    tab.title.includes(searchText) || tab.content.includes(searchText)
+  );
+
 
   return (
     <div style={{ padding: '1rem' }}>
       <h1>📝 タブ付きメモ帳</h1>
+      <input
+        type="text"
+        placeholder="検索..."
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        style={{
+          padding: '0.5rem',
+          marginBottom: '1.5rem', // ← ✨ ここを調整！
+          width: '100%',
+          fontSize: '1rem',
+          border: '1px solid #ccc',
+          borderRadius: '5px'
+        }}
+      />
 
       {/* タブバー */}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-        {tabs.map(tab => (
+        {filteredTabs.map(tab => (
           editingTabId === tab.id ? (
             <input
               type="text"
@@ -118,7 +152,7 @@ function App() {
                 marginRight: '0.25rem'
               }}
             >
-              {tab.title}
+              {highlightMatch(tab.title, searchText)}
             </button>
           )
         ))}
@@ -136,6 +170,9 @@ function App() {
             cols={50}
             style={{ width: '100%', fontSize: '1rem', padding: '0.5rem' }}
           />
+          <p style={{ whiteSpace: 'pre-wrap' }}>
+            {highlightMatch(activeTab?.content ?? '', searchText)}
+          </p>
         </div>
       ) : (
         <p>メモがありません。新しいタブを追加してください。</p>

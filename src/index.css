@@ -1,0 +1,7 @@
+/* src/index.css */
+mark {
+    background-color: #ffeaa7;
+    font-weight: bold;
+    border-radius: 3px;
+    padding: 0 2px;
+}

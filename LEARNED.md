@@ -1,5 +1,93 @@
 # 📘 LEARNED.md - タブ切り替えメモ帳（ステップ１）
 
+## 📘 LEARNED.md - ver 1.6（検索結果のハイライトと状態設計の深掘り）
+
+---
+
+### ✅ 今回やったこと
+
+* 検索語を含むタブタイトル・本文の一致部分をハイライト表示する機能を追加
+
+  * `highlightMatch(text, keyword)` 関数を実装し、JSX内で `<mark>` タグを使って強調表示
+  * `split()` + `RegExp()` + `map()` の合わせ技で、キーワードを含むテキストを柔軟にパーツ分割
+  * 大文字小文字の違いを無視して一致させるため、`.toLowerCase()` を比較に活用
+* `<mark>` タグのスタイルを `index.css` に追加し、柔らかい見た目に整形
+* JSX中の `textarea` に加え、検索語に一致した本文のプレビュー（`<p>`）も表示する構成に調整
+* 検索欄と本文の間に余白や区切り線（`<hr>`）を追加し、UIの視認性を改善
+
+---
+
+### 🧠 学び・気づき
+
+#### 🔹 `<mark>` タグのセマンティクス
+
+* `mark` は単なる背景色ではなく、「注目箇所・検索結果」を意味するHTML5の意味付きタグ
+* スクリーンリーダーなどの支援技術にも有益な構造であり、意味のあるマークアップが実現できる
+
+#### 🔹 `highlightMatch()` 関数の構造美
+
+```js
+const highlightMatch = (text, keyword) => {
+  if (!keyword) return text;
+  const parts = text.split(new RegExp(`(${keyword})`, 'gi'));
+  return parts.map((part, i) =>
+    part.toLowerCase() === keyword.toLowerCase() ? (
+      <mark key={i}>{part}</mark>
+    ) : (
+      <span key={i}>{part}</span>
+    )
+  );
+};
+```
+
+* 正規表現で検索語をグルーピングしつつ分割
+* `map()` と三項演算子で JSX を分岐描画
+* `toLowerCase()` による case-insensitive 比較が鍵
+* `key` を使って React の再描画最適化も考慮
+
+#### 🔹 CSSを適用するために必要な import
+
+* `index.css` を使う場合は、`index.js` に `import './index.css';` を追加することで全体に適用される
+
+#### 🔹 状態の初期値は意味を持つ
+
+```js
+const [tabs, setTabs] = useState([]);              // 配列（データ）
+const [activeTabId, setActiveTabId] = useState(null); // ID or null（選択なし）
+const [nextTabNumber, setNextTabNumber] = useState(1); // 数字（カウンター）
+const [editingTabId, setEditingTabId] = useState(null); // 編集対象ID
+const [searchText, setSearchText] = useState('');     // 検索キーワード
+```
+
+* 状態が「どんな意味を持っているか」を初期値が物語っている
+* `null` を使うことで「まだ何も選ばれていない」などの状態を明示できる
+
+#### 🔹 TypeScript で書けばさらに読みやすくなる予感
+
+* `useState<number | null>(null)` のように型を明示できれば、コードの意図がさらに明確に
+* 今の設計はすでに型に分解できるほどしっかりしており、TS化の土台が整っている
+
+---
+
+### 📝 コミットメッセージ案
+
+```
+feat: 検索結果のハイライト表示を追加
+```
+
+* `highlightMatch()` 関数を追加し、検索語にマッチした部分を `<mark>` タグで強調
+* `mark` タグのスタイルを `index.css` に追加して視認性アップ
+* 大文字小文字の違いを無視したマッチング処理に対応
+* JSX内で `split()` + `map()` による部分描画制御を実現
+
+---
+
+次は TypeScript 化や Markdown対応、保存形式の拡張などに進める土台が整いました！
+
+</br>
+</br>
+</br>
+
 ## 📘 LEARNED.md - ver 1.4（タブタイトルのインライン編集と状態の再設計）
 
 ---
@@ -152,7 +240,7 @@ feat: localStorage を用いたタブ状態の永続化機能を実装
 * tabs.length === 0 のときの初期化処理も追加
 * localStorage の仕様に応じた復元ロジックを強化
 
-<</br></br>/br>
+</br></br></br>
 ## 📘 LEARNED.md - ver 1.2（タブ削除機能 & タイトル重複防止）
 ### ✅ 今回やったこと
 
@@ -342,6 +430,7 @@ src/
 </br>
 </br>
 </br>
+
 ## ver1.0
 
 ## ✅ 今回やったこと
