@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from './App.module.css';
+import PreviewCard from './components/PreviewCard.jsx';
+import TabBar from './components/TabBar';
+import SearchBar from './components/SearchBar.jsx';
+import NoteEditor from './components/NoteEditor.jsx';
 
 
 // ✅ 1. キャッシュを外で定義（Appの外、ファイル先頭付近）
@@ -70,7 +74,6 @@ function App() {
   }, [tabs, activeTabId, nextTabNumber]);
 
 
-
   const handleAddTab = () => {
     const newId = Date.now();
     setTabs([
@@ -122,7 +125,6 @@ function App() {
     );
   };
 
-
   const activeTab = tabs.find(tab => tab.id === activeTabId);
   const filteredTabs = tabs.filter(tab =>
     tab.title.includes(searchText) || tab.content.includes(searchText)
@@ -150,97 +152,37 @@ function App() {
       </h1>
 
       {/* 検索ボックス */}
-      <input
-        type="text"
-        placeholder="検索..."
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        className="w-full px-3 py-2 mb-6 text-base border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-
+      <SearchBar
+        searchText={searchText}
+        onSearch={setSearchText}
       />
 
       {/* タブバー */}
-      <div className="flex gap-2 mb-4">
-        {filteredTabs.map(tab => (
-          editingTabId === tab.id ? (
-            <input
-              type="text"
-              value={tab.title}
-              onChange={(e) => {
-                const newTitle = e.target.value;
-                setTabs(prevTabs =>
-                  prevTabs.map(t =>
-                    t.id === tab.id ? { ...t, title: newTitle } : t
-                  )
-                );
-              }}
-              onBlur={() => setEditingTabId(null)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  setEditingTabId(null);
-                }
-              }}
-              autoFocus
-              className={styles.tabInput}
-            />
-          ) : (
-            <button
-              onClick={() => handleTabClick(tab.id)}
-              onDoubleClick={() => setEditingTabId(tab.id)}
-              className={`px-4 py-2 rounded-md border ${tab.id === activeTabId
-                ? 'bg-blue-100 font-bold text-blue-700'
-                : 'bg-gray-100 hover:bg-gray-200'
-                }`}
-            >
-              {highlightMatch(tab.title, searchText)}
-            </button>
+      <TabBar
+        tabs={tabs}
+        activeTabId={activeTabId}
+        editingTabId={editingTabId}
+        searchText={searchText}
+        onTabClick={handleTabClick}
+        onTabEdit={setEditingTabId}
+        onTabTitleChange={(id, newTitle) =>
+          setTabs((prevTabs) =>
+            prevTabs.map((t) => (t.id === id ? { ...t, title: newTitle } : t))
           )
-        ))}
-        <button onClick={handleAddTab}>＋</button>
-      </div>
+        }
+        onAddTab={handleAddTab}
+        highlightMatch={highlightMatch}
+      />
 
       {/* メモ本文 */}
       {activeTab && (
-        <>
-          <h2>{activeTab.title}</h2>
-          <textarea
-            value={activeTab.content}
-            onChange={handleChangeContent}
-            rows={10}
-            cols={50}
-            className={styles.textarea}
-          />
-          {linkPreview && (
-            <div className="max-w-md border rounded-lg p-4 shadow-sm bg-white mb-4">
-              <a href={linkPreview.url} target="_blank" rel="noopener noreferrer" className="no-underline text-black">
-                <h4 className="text-lg font-semibold mb-2">
-                  {linkPreview.title || linkPreview.url}
-                </h4>
-                {linkPreview.description
-                  ? <p className="text-sm text-gray-700 mb-2">{linkPreview.description}</p>
-                  : <p className="text-sm text-gray-400 italic mb-2">説明文は見つかりませんでした</p>}
-                {linkPreview.image?.url && (
-                  <img
-                    src={linkPreview.image.url}
-                    alt=""
-                    className="w-full h-auto rounded max-h-48 object-contain"
-                  />
-                )}
-              </a>
-            </div>
-          )}
-
-          <h3>プレビュー</h3>
-          {searchText ? (
-            <div className={styles.previewText}>
-              {highlightMatch(activeTab.content, searchText)}
-            </div>
-          ) : (
-            <div className="prose max-w-none">
-              <ReactMarkdown>{activeTab.content}</ReactMarkdown>
-            </div>
-          )}
-        </>
+        <NoteEditor
+          activeTab={activeTab}
+          searchText={searchText}
+          linkPreview={linkPreview}
+          onChangeContent={handleChangeContent}
+          highlightMatch={highlightMatch}
+        />
       )}
     </div>
   );

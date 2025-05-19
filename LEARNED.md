@@ -1,5 +1,89 @@
 # 📘 LEARNED.md - タブ切り替えメモ帳（ステップ１）
 
+## 📘 LEARNED.md - ver 2.5（TabBar / SearchBar / NoteEditor のコンポーネント分離）
+
+---
+
+### ✅ 今回やったこと
+
+* `App.js` が大きくなってきたので、UI部分を一部分割
+* `SearchBar`, `TabBar`, `NoteEditor` を個別コンポーネント化
+* `props` による情報渡しの機構を理解
+* `App.js` の `return` 部分が大幅に短縮
+* 同時に Tailwind CSS でのスタイリングの効果を保ちながら保存
+
+---
+
+### 🧠 学び・気づき
+
+#### ▹ 「props に関数を渡す」というReactの基本
+
+* `SearchBar` では `onSearch={setSearchText}` のように、親の状態更替関数を子に渡す
+* 子は `props.onSearch("text")` のように呼び出して通信
+* 対話型、指示型の実装になる
+
+#### ▹ TabBarの切り出しで理解できたこと
+
+* `tabs.map()` による複数ボタン表示は、実際にはかなり長文になりがち
+* `editingTabId === tab.id` で「編集モード」を分分で表現
+* `TabBar.jsx` に切り出したことで、App側は `<TabBar ... />` で簡潔に
+* 編集モードのイベントも `onDoubleClick`, `onBlur`, `onKeyDown` ですっきり分離
+
+#### ▹ JSX の分離の利点
+
+* `App.js` の `return` が 100行近くあったのが、40行前後に短縮
+* `NoteEditor.jsx` に分離したことで、Markdown表示やOGPプレビューの説明が分離されてはるかに見通しが良くなった
+
+---
+
+### 🔎 コンポーネント化の構成
+
+```txt
+src/
+├── App.js
+└── components/
+    ├── SearchBar.jsx
+    ├── TabBar.jsx
+    ├── NoteEditor.jsx
+    └── PreviewCard.jsx
+```
+
+---
+
+### 🖊️ コミットメッセージ案
+
+```
+refactor: SearchBar / TabBar / NoteEditor を分割して構造を改善
+```
+
+* 各UI部分を個別のコンポーネントとして分離
+* `props` で情報をやり取りする指向を明確化
+* Tailwind CSS や local state はそのまま残して移行性を確保
+
+---
+
+### 🔮 次にやりたいこと
+
+* `NoteEditor.module.css` などの CSS 分離
+* OGP プレビューの複数URL対応
+* Tailwind Typography + shadcn/ui による表示統一
+* コンポーネント単位でのテスト通過
+* localStorage キャッシュのモジュール化 (indexedDB?)
+
+---
+
+### 🌟 さらに感じたこと
+
+* `useEffect(() => { ... })` は便利だが、処理名をつけた方が分かりやすい
+
+  * 例: `useEffect(() => { restoreFromLocalStorage() }, [])`
+* `props` に関数を渡す構造はReactの心臓であり、上位解耦の有力な工具
+* 分割
+
+</br>
+</br>
+</br>
+
 ## 📘 LEARNED.md - ver 2.4（OGPプレビュー表示の改善とTailwind活用の理解）
 
 ---
