@@ -5,31 +5,8 @@ import PreviewCard from './components/PreviewCard.jsx';
 import TabBar from './components/TabBar';
 import SearchBar from './components/SearchBar.jsx';
 import NoteEditor from './components/NoteEditor.jsx';
+import { fetchPreview } from './utils/fetchPreview'; // 相対パスに注意
 
-
-// ✅ 1. キャッシュを外で定義（Appの外、ファイル先頭付近）
-const previewCache = new Map();
-
-// ✅ 2. fetchPreview関数でキャッシュを活用
-const fetchPreview = async (url) => {
-  if (previewCache.has(url)) {
-    return previewCache.get(url);
-  }
-
-  try {
-    const res = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);
-    const json = await res.json();
-
-    if (json.status === 'success') {
-      previewCache.set(url, json.data);
-      return json.data;
-    } else {
-      return null;
-    }
-  } catch {
-    return null;
-  }
-};
 
 
 function App() {
@@ -39,7 +16,6 @@ function App() {
   const [editingTabId, setEditingTabId] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [linkPreview, setLinkPreview] = useState(null);
-
 
   // ✅ 起動時に localStorage から復元 or 初期化
   useEffect(() => {
@@ -143,49 +119,59 @@ function App() {
     }
   }, [activeTab?.content]);
 
-
   return (
-    <div className={styles.container}>
-      <h1>📝 タブ付きメモ帳</h1>
-      <h1 className="text-2xl text-blue-600 font-bold">
-        Tailwind きてる？🚀
-      </h1>
+    <div className="min-h-screen bg-gray-100 py-8 px-4">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <h1 className="text-3xl font-bold text-blue-600 mb-4">
+          📝 タブ付きメモ帳
+        </h1>
 
-      {/* 検索ボックス */}
-      <SearchBar
-        searchText={searchText}
-        onSearch={setSearchText}
-      />
+        {/* 検索ボックス */}
+        <section className="bg-white rounded-xl shadow p-4">
+          <h2 className="text-xl font-semibold text-gray-800 mb-3">🔍 検索</h2>
+          <SearchBar
+            searchText={searchText}
+            onSearch={setSearchText}
+          />
+        </section>
 
-      {/* タブバー */}
-      <TabBar
-        tabs={tabs}
-        activeTabId={activeTabId}
-        editingTabId={editingTabId}
-        searchText={searchText}
-        onTabClick={handleTabClick}
-        onTabEdit={setEditingTabId}
-        onTabTitleChange={(id, newTitle) =>
-          setTabs((prevTabs) =>
-            prevTabs.map((t) => (t.id === id ? { ...t, title: newTitle } : t))
-          )
-        }
-        onAddTab={handleAddTab}
-        highlightMatch={highlightMatch}
-      />
+        {/* タブバー */}
+        <section className="bg-white rounded-xl shadow p-4">
+          <h2 className="text-xl font-semibold text-gray-800 mb-3">📑 タブ一覧</h2>
+          <TabBar
+            tabs={tabs}
+            activeTabId={activeTabId}
+            editingTabId={editingTabId}
+            searchText={searchText}
+            onTabClick={handleTabClick}
+            onTabEdit={setEditingTabId}
+            onTabTitleChange={(id, newTitle) =>
+              setTabs((prevTabs) =>
+                prevTabs.map((t) => (t.id === id ? { ...t, title: newTitle } : t))
+              )
+            }
+            onAddTab={handleAddTab}
+            highlightMatch={highlightMatch}
+          />
+        </section>
 
-      {/* メモ本文 */}
-      {activeTab && (
-        <NoteEditor
-          activeTab={activeTab}
-          searchText={searchText}
-          linkPreview={linkPreview}
-          onChangeContent={handleChangeContent}
-          highlightMatch={highlightMatch}
-        />
-      )}
+        {/* メモ本文 */}
+        <section className="bg-white rounded-xl shadow p-4">
+          <h2 className="text-xl font-semibold text-gray-800 mb-3">📝 メモ本文</h2>
+          {activeTab && (
+            <NoteEditor
+              activeTab={activeTab}
+              searchText={searchText}
+              linkPreview={linkPreview}
+              onChangeContent={handleChangeContent}
+              highlightMatch={highlightMatch}
+            />
+          )}
+        </section>
+      </div>
     </div>
   );
+
 }
 
 export default App;
