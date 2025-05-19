@@ -210,18 +210,26 @@ function App() {
             cols={50}
             className={styles.textarea}
           />
-
           {linkPreview && (
-            <div className={styles.previewCard}>
-              <a href={linkPreview.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <h4>{linkPreview.title}</h4>
-                <p>{linkPreview.description}</p>
+            <div className="max-w-md border rounded-lg p-4 shadow-sm bg-white mb-4">
+              <a href={linkPreview.url} target="_blank" rel="noopener noreferrer" className="no-underline text-black">
+                <h4 className="text-lg font-semibold mb-2">
+                  {linkPreview.title || linkPreview.url}
+                </h4>
+                {linkPreview.description
+                  ? <p className="text-sm text-gray-700 mb-2">{linkPreview.description}</p>
+                  : <p className="text-sm text-gray-400 italic mb-2">説明文は見つかりませんでした</p>}
                 {linkPreview.image?.url && (
-                  <img src={linkPreview.image.url} alt="" className={styles.image} />
+                  <img
+                    src={linkPreview.image.url}
+                    alt=""
+                    className="w-full h-auto rounded max-h-48 object-contain"
+                  />
                 )}
               </a>
             </div>
           )}
+
           <h3>プレビュー</h3>
           {searchText ? (
             <div className={styles.previewText}>
